@@ -5,6 +5,8 @@ from pages.inventory_page import InventoryPage
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 
+
+# Test de login válido
 def test_valid_login(driver):
     login_page = LoginPage(driver)
     inventory_page = InventoryPage(driver)
