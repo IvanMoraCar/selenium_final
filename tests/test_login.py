@@ -1,21 +1,16 @@
-import logging
-from pages.login_page import LoginPage
-from pages.inventory_page import InventoryPage
+from selenium.webdriver.common.by import By
+import time
 
-# Configurar logging
-logging.basicConfig(level=logging.INFO)
+def test_login_invalid_credentials(driver):
+    driver.get("https://the-internet.hackerearth.com/login")
 
+    # Ingresar usuario y contraseña inválidos
+    driver.find_element(By.ID, "username").send_keys("usuario_falso")
+    driver.find_element(By.ID, "password").send_keys("clave_incorrecta")
+    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
 
-# Test de login válido y prueba con jenkies 3
-def test_valid_login(driver):
-    login_page = LoginPage(driver)
-    inventory_page = InventoryPage(driver)
+    time.sleep(1)  # Esperar brevemente la aparición del mensaje
 
-    logging.info("Cargando página de login...")
-    login_page.load()
-
-    logging.info("Realizando login...")
-    login_page.login("standard_user", "secret_sauce")
-
-    logging.info("Verificando que el inventario se haya cargado...")
-    assert inventory_page.is_loaded()
+    # Verificar que aparece el mensaje de error
+    mensaje = driver.find_element(By.ID, "flash").text
+    assert "Your username is invalid!" in mensaje
