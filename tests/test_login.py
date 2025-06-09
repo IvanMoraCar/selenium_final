@@ -1,16 +1,28 @@
 from selenium.webdriver.common.by import By
-import time
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-def test_login_invalid_credentials(driver):
-    driver.get("https://the-internet.hackerearth.com/login")
+def login(driver, username, password):
+    driver.get("https://the-internet.herokuapp.com/login")
 
-    # Ingresar usuario y contraseña inválidos
-    driver.find_element(By.ID, "username").send_keys("usuario_falso")
-    driver.find_element(By.ID, "password").send_keys("clave_incorrecta")
-    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    driver.find_element(By.ID, "username").send_keys(username)
+    driver.find_element(By.ID, "password").send_keys(password)
+    driver.find_element(By.CLASS_NAME, "radius").click()
 
-    time.sleep(1)  # Esperar brevemente la aparición del mensaje
+def test_login(driver):
+    login(driver, "tomsmith", "SuperSecretPassword!")
 
-    # Verificar que aparece el mensaje de error
-    mensaje = driver.find_element(By.ID, "flash").text
-    assert "Your username is invalid!" in mensaje
+    flash_messenger = WebDriverWait(driver, 5).until(
+        EC.visibility_of_element_located((By.ID, "flash"))
+    )
+
+    assert "You logged into a secure area!" in flash_messenger.text, "Error: el mensaje no es el esperado"
+
+def test_login_error(driver):
+    login(driver, "wronguser", "wrongpass")
+
+    flash_messenger = WebDriverWait(driver, 5).until(
+        EC.visibility_of_element_located((By.ID, "flash"))
+    )
+
+    assert "Your username is invalid!" in flash_messenger.text, "Error: el mensaje no es el esperado"
